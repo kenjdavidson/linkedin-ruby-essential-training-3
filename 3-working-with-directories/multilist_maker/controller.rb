@@ -1,17 +1,21 @@
 
+require_relative 'list_dir'
 require_relative 'list_file'
 
-module ListMaker
+module MultilistMaker
   class Controller
 
-    @@valid_actions = ["view", "add", "edit", "remove", "quit"]
+    @@valid_actions = ["view", "add", "edit", "remove", "load", "quit"]
 
     def initialize
-      @list_file = ListMaker::ListFile.new
+      @list_dir = MultilistMaker::ListDir.new
+      @list_file = MultilistMaker::ListFile.new
     end
 
     def launch!
       introduction
+
+      do_action('load', [])
 
       loop do 
         action, args = get_action
@@ -42,7 +46,8 @@ module ListMaker
     def get_action
       action = nil
       until @@valid_actions.map{ |a| a.to_s }.include?(action)
-        puts "\nAction: #{@@valid_actions.join(', ')}"
+        puts "#{@list_file.listname.capitalize}"
+        puts "Action: #{@@valid_actions.join(', ')}"
         print "> "
         response = gets.chomp
         # Downcase and split the entered values
@@ -64,6 +69,9 @@ module ListMaker
         @list_file.edit args
       when "remove"
         @list_file.remove args
+      when "load"
+        new_file = @list_dir.choose_list
+        @list_file = MultilistMaker::ListFile.new(new_file)
       else 
         puts "Sorry, #{action} is not an option."
       end 

@@ -1,12 +1,14 @@
 
-module ListMaker
+module MultilistMaker
   class ListFile 
     DEFAULT_FILENAME = 'lm_list.txt'
 
     # Locate the list file and confirm it's read/writable
     # if possible then open it and return self
     def initialize(filename = DEFAULT_FILENAME)
-      @filename = File.join(APP_ROOT, filename)
+      @filename ||= filename
+      @dirname = MultilistMaker::ListDir.dirname
+      @filepath = File.join(@dirname, @filename)
 
       validate_file
       self
@@ -15,7 +17,7 @@ module ListMaker
     # Read from the file, adding numbers next to the list item
     def view       
       puts
-      puts "VIEW LIST"
+      puts "Viewing #{listname.capitalize} List"
 
       items.each_with_index do |item, index| 
         puts "#{index+1}. #{item}"
@@ -25,10 +27,10 @@ module ListMaker
     # Add item to the end of list
     def add 
       puts
-      puts "ADD NEW ITEM"
+      puts "Add Item to #{listname.capitalize} List"
       print "What would you like to add > "
       new_item = gets.chomp
-      File.open(@filename, 'a') do |file|
+      File.open(@filepath, 'a') do |file|
         file << new_item
         file << "\n"
       end 
@@ -46,12 +48,12 @@ module ListMaker
         puts "There is no item #{args[0]}"
       else 
         puts
-        puts "EDITING ITEM #{args[0]}"
+        puts "Editing Item #{args[0]}"
         puts "Current > #{item_list[index]}"
         print "Update  > "
         item_list[index] = gets
 
-        File.write(@filename, item_list.join)
+        File.write(@filepath, item_list.join)
       end
     end    
 
@@ -61,32 +63,34 @@ module ListMaker
       item_list = items
       index = args[0].to_i - 1
 
-      puts
-      puts "REMOVING ITEM #{args[0]} #{item_list[index]}"
-      
+      puts      
       if item_list.length < index + 1
         puts "There is no item #{args[0]}"
-      else 
-        puts
-        item_list.drop index
-
-        File.write(@filename, item_list.join)
+      else
+        puts "Removing Item from #{listname.capitalize} List: #{args[0]} #{item_list[index]}" 
+        item_list.delete_at(index)
+        File.write(@filepath, item_list.join)
       end
+    end 
+
+    def listname
+      index = @filename.index('.')
+      @filename[0...index]
     end 
 
   private 
 
     def items 
       validate_file 
-      File.readlines(@filename)
+      File.readlines(@filepath)
     end 
 
     def validate_file(mode = 'r')
-      unless File.exist? @filename 
-        File.new(@filename, 'w+').close
+      unless File.exist? @filepath 
+        File.new(@filepath, 'w+').close
       end 
-      abort "File is not readable" unless File.readable? @filename
-      abort "File is not writable" unless File.writable? @filename
+      abort "File is not readable" unless File.readable? @filepath
+      abort "File is not writable" unless File.writable? @filepath
     end 
   end 
 end 
