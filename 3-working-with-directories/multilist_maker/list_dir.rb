@@ -12,11 +12,14 @@ module MultilistMaker
     # Find directory or create it if it doesn't exist
     # Locate list of directories in APP_ROOT and confirm it's readable and writable
     def initialize 
-      if Dir.exist? self.class.dirname
-        raise "Directory is not readable" unless File.readable? self.class.dirname
-        raise "Directory is not writable" unless File.writable? self.class.dirname
+      @dirpath = self.class.dirname
+
+      if Dir.exist? @dirpath
+        raise "Directory is not readable" unless File.readable? @dirpath
+        raise "Directory is not writable" unless File.writable? @dirpath
       else 
-        Dir.mdkir self.class.dirname
+        Dir.mdkir @dirpath
+        raise "Directory does not exist and could not be created" unlesss Dir.exist? @dirpath
       end 
 
       refresh_cached_files
