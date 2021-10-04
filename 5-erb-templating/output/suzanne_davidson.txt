@@ -3,8 +3,8 @@ Dear Suzanne Davidson
 The following library book is overdue.
 
 "Some Other Book"
-Due: 01-Oct-2021
+Due: 2021-07-01
 
-Overdue fee: $15.00
+Overdue fee: $95.00
 
 Thank you for your prompt attention to this matter.
